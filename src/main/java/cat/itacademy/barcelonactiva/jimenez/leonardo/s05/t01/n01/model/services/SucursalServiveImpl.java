@@ -10,7 +10,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,20 +44,24 @@ public class SucursalServiveImpl implements SucursalService {
         return sucursalRepository.findAll();
     }
 
-    private SucursalDTO convertToDto(Sucursal post) {
-        SucursalDTO sucursalDTO = ctx.getBean(ModelMapper.class).map(post, SucursalDTO.class);
-
+    public SucursalDTO convertToDto(Sucursal sucursal) {
+        SucursalDTO sucursalDTO = ctx.getBean(ModelMapper.class).map(sucursal, SucursalDTO.class);
+        if(sucursalDTO.getCountries().stream().anyMatch(p -> sucursal.getPaisSucursal().equalsIgnoreCase(p))){
+            sucursalDTO.setTipusSucursal("UE");
+        }else{
+            sucursalDTO.setTipusSucursal("Fora UE");
+        }
         return sucursalDTO;
     }
 
-    private Sucursal convertToEntity(SucursalDTO sucursalDTO) throws ParseException {
-        Sucursal post = ctx.getBean(ModelMapper.class).map(sucursalDTO, Sucursal.class);
+    public Sucursal convertToEntity(SucursalDTO sucursalDTO) {
+        Sucursal sucursal = ctx.getBean(ModelMapper.class).map(sucursalDTO, Sucursal.class);
 
-        if (sucursalDTO.getPk_SucursalID()!= null) {
-            Optional<Sucursal> oldPost = sucursalRepository.findById(Long.valueOf(sucursalDTO.getPk_SucursalID()));
-            post.setNomSucursal(oldPost.get().getNomSucursal());
-            post.setPaisSucursal(oldPost.get().getPaisSucursal());
+        if (sucursalDTO.getPk_SucursalID() != null) {
+            Optional<Sucursal> oldSucursal = sucursalRepository.findById(Long.valueOf(sucursalDTO.getPk_SucursalID()));
+            sucursal.setNomSucursal(oldSucursal.get().getNomSucursal());
+            sucursal.setPaisSucursal(oldSucursal.get().getPaisSucursal());
         }
-        return post;
+        return sucursal;
     }
 }

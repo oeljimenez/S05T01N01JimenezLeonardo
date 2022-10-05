@@ -1,10 +1,21 @@
 package cat.itacademy.barcelonactiva.jimenez.leonardo.s05.t01.n01.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.Arrays;
+import java.util.List;
+
 public class SucursalDTO {
     private Integer pk_SucursalID;
     private String nomSucursal;
     private String paisSucursal;
     private String tipusSucursal;
+
+    @JsonIgnore
+    private List<String> countries = Arrays.asList("Austria", "Belgium", "Bulgaria", "Croatia", "Republic of Cyprus",
+            "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Germany", "Greece", "Hungary", "Ireland",
+            "Italy", "Latvia", "Lithuania", "Luxembourg", "Malta", "Netherlands", "Poland", "Portugal", "Romania",
+            "Slovakia", "Slovenia", "Spain", "Sweden");
 
     public Integer getPk_SucursalID() {
         return pk_SucursalID;
@@ -36,5 +47,13 @@ public class SucursalDTO {
 
     public void setTipusSucursal(String tipusSucursal) {
         this.tipusSucursal = tipusSucursal;
+    }
+
+    public List<String> getCountries() {
+        return countries;
+    }
+
+    public void setCountries(List<String> countries) {
+        this.countries = countries;
     }
 }

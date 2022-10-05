@@ -7,28 +7,28 @@ import javax.persistence.*;
 public class Sucursal {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private long pk_SucursalID;
 
     @Column(name = "nom")
     private String nomSucursal;
 
     @Column(name = "pais")
-    private int paisSucursal;
+    private String paisSucursal;
 
     public Sucursal() {
     }
 
-    public Sucursal(String nomSucursal, int paisSucursal) {
+    public Sucursal(String nomSucursal, String paisSucursal) {
         this.nomSucursal = nomSucursal;
         this.paisSucursal = paisSucursal;
     }
 
-    public long getId() {
-        return id;
+    public long getPk_SucursalID() {
+        return pk_SucursalID;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setPk_SucursalID(long pk_SucursalID) {
+        this.pk_SucursalID = pk_SucursalID;
     }
 
     public String getNomSucursal() {
@@ -39,20 +39,20 @@ public class Sucursal {
         this.nomSucursal = nomSucursal;
     }
 
-    public int getPaisSucursal() {
+    public String getPaisSucursal() {
         return paisSucursal;
     }
 
-    public void setPaisSucursal(int paisSucursal) {
+    public void setPaisSucursal(String paisSucursal) {
         this.paisSucursal = paisSucursal;
     }
 
     @Override
     public String toString() {
         return "Sucursal{" +
-                "id=" + id +
+                "pk_SucursalID=" + pk_SucursalID +
                 ", nomSucursal='" + nomSucursal + '\'' +
-                ", paisSucursal=" + paisSucursal +
+                ", paisSucursal='" + paisSucursal + '\'' +
                 '}';
     }
 }
