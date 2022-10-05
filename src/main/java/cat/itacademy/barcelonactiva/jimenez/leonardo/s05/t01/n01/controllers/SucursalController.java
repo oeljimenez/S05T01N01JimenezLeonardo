@@ -16,10 +16,8 @@ import java.util.Optional;
 @RequestMapping("/sucursal")
 public class SucursalController {
     Logger logger = (Logger) LoggerFactory.getLogger(SucursalController.class);
-
     @Autowired
     SucursalService sucursalService;
-
     @PostMapping("/add")
     public ResponseEntity<Sucursal> add(@RequestBody Sucursal sucursal) {
         logger.info("Calling add method");
@@ -29,7 +27,6 @@ public class SucursalController {
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @PutMapping("/update/{id}")

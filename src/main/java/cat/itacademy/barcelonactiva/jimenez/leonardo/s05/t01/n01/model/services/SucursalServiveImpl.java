@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,5 +49,16 @@ public class SucursalServiveImpl implements SucursalService {
         SucursalDTO sucursalDTO = ctx.getBean(ModelMapper.class).map(post, SucursalDTO.class);
 
         return sucursalDTO;
+    }
+
+    private Sucursal convertToEntity(SucursalDTO sucursalDTO) throws ParseException {
+        Sucursal post = ctx.getBean(ModelMapper.class).map(sucursalDTO, Sucursal.class);
+
+        if (sucursalDTO.getPk_SucursalID()!= null) {
+            Optional<Sucursal> oldPost = sucursalRepository.findById(Long.valueOf(sucursalDTO.getPk_SucursalID()));
+            post.setNomSucursal(oldPost.get().getNomSucursal());
+            post.setPaisSucursal(oldPost.get().getPaisSucursal());
+        }
+        return post;
     }
 }
