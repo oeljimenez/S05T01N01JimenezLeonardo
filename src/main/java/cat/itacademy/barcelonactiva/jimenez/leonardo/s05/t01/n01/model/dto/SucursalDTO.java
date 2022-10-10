@@ -56,4 +56,15 @@ public class SucursalDTO {
     public void setCountries(List<String> countries) {
         this.countries = countries;
     }
+
+    @Override
+    public String toString() {
+        return "SucursalDTO{" +
+                "pk_SucursalID=" + pk_SucursalID +
+                ", nomSucursal='" + nomSucursal + '\'' +
+                ", paisSucursal='" + paisSucursal + '\'' +
+                ", tipusSucursal='" + tipusSucursal + '\'' +
+                ", countries=" + countries +
+                '}';
+    }
 }

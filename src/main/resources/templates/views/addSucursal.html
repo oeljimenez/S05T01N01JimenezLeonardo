@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="plantilla/template :: head">
+</head>
+<body>
+<header th:replace="plantilla/template :: header"></header>
+<div class="container">
+    <div class="card bg-light">
+        <div class="card-header bg-dark text-white">Afegir Sucursal</div>
+
+        <div class="card-body">
+            <form th:action="@{/sucursal/save}" th:object="${sucursalDTO}" method="post">
+                <div class="mb-3">
+                    <input type="hidden" th:field="*{pk_SucursalID}">
+                    <label for="nom" class="form-label">Nom Sucursal</label>
+                    <input type="text" th:field="*{nomSucursal}" class="form-control" id="nom"
+                           aria-describedby="emailHelp">
+
+                </div>
+                <div class="mb-3">
+                    <label for="pais" class="form-label">País Sucursal</label>
+                    <input type="text" th:field="*{paisSucursal}" class="form-control" id="pais">
+
+                </div>
+                <button type="submit" class="btn btn-primary bg-dark text-white btn-outline-light">Guardar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="plantilla/template :: footer"></footer>
+</body>
+</html>

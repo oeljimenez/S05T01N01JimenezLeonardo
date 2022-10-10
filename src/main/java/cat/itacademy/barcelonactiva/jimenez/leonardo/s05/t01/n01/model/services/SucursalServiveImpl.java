@@ -22,21 +22,16 @@ public class SucursalServiveImpl implements SucursalService {
     ApplicationContext ctx = new AnnotationConfigApplicationContext(S05T01N01JimenezLeonardoSpringConfig.class);
 
     @Override
-    public void add(Sucursal sucursal) {
+    public void save(Sucursal sucursal) {
         sucursalRepository.save(sucursal);
     }
 
     @Override
-    public void update(Sucursal sucursal) {
-        sucursalRepository.save(sucursal);
-    }
-
-    @Override
-    public void deleteById(Long id) {
+    public void deleteById(Integer id) {
         sucursalRepository.deleteById(id);
     }
 
-    public Optional<Sucursal> findById(Long id) {
+    public Optional<Sucursal> findById(Integer id) {
         return sucursalRepository.findById(id);
     }
 
@@ -56,12 +51,16 @@ public class SucursalServiveImpl implements SucursalService {
 
     public Sucursal convertToEntity(SucursalDTO sucursalDTO) {
         Sucursal sucursal = ctx.getBean(ModelMapper.class).map(sucursalDTO, Sucursal.class);
+        System.out.println("converto entity-->"+ sucursalDTO);
 
         if (sucursalDTO.getPk_SucursalID() != null) {
-            Optional<Sucursal> oldSucursal = sucursalRepository.findById(Long.valueOf(sucursalDTO.getPk_SucursalID()));
-            sucursal.setNomSucursal(oldSucursal.get().getNomSucursal());
-            sucursal.setPaisSucursal(oldSucursal.get().getPaisSucursal());
+            System.out.println("converto entity-->"+ sucursalDTO);
+            Optional<Sucursal> oldSucursal = sucursalRepository.findById(sucursalDTO.getPk_SucursalID());
+            sucursal.setNomSucursal(sucursalDTO.getNomSucursal());
+            sucursal.setPaisSucursal(sucursalDTO.getPaisSucursal());
         }
+
+
         return sucursal;
     }
 }

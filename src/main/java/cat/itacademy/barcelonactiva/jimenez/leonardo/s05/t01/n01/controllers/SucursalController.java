@@ -8,8 +8,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,75 +27,99 @@ public class SucursalController {
     @Autowired
     SucursalService sucursalService;
 
-    @PostMapping("/add")
-    public ResponseEntity<SucursalDTO> add(@RequestBody SucursalDTO sucursalDTO) {
+    @GetMapping("/")
+    public ModelAndView index() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("index");
+        return modelAndView;
+    }
+
+    @GetMapping("/add")
+    public ModelAndView add() {
         logger.info("Calling add method");
-        try {
-            Sucursal sucursal = sucursalService.convertToEntity(sucursalDTO);
-            sucursalService.add(sucursal);
-            return new ResponseEntity<>(sucursalService.convertToDto(sucursal), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        SucursalDTO sucursalDTO = new SucursalDTO();
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("sucursalDTO", sucursalDTO);
+        modelAndView.setViewName("views/addSucursal");
+        return modelAndView;
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<SucursalDTO> update(@PathVariable("id") long id, @RequestBody SucursalDTO sucursalDTO) {
+    @PostMapping("/save")
+    public ModelAndView save(@Valid @ModelAttribute SucursalDTO sucursalDTO, BindingResult result,
+                             RedirectAttributes attribute) {
+        logger.info("Calling save method");
+
+        if (result.hasErrors()) {
+            ModelAndView modelAndView = new ModelAndView();
+            modelAndView.addObject("sucursalDTO", sucursalDTO);
+            logger.info("Error when saving Sucursal save method");
+            modelAndView.setViewName("views/addSucursal");
+            return modelAndView;
+        }
+
+        sucursalService.save(sucursalService.convertToEntity(sucursalDTO));
+        attribute.addFlashAttribute("success", "Sucursal afegida amb èxit");
+        return new ModelAndView("redirect:" + "/sucursal/getAll");
+    }
+
+    @GetMapping("/update/{id}")
+    public ModelAndView update(@PathVariable("id") Integer id, RedirectAttributes attribute) {
         logger.info("Calling update method");
-        try {
-            Optional<Sucursal> sucursal = sucursalService.findById(id);
-            if (sucursal.isPresent()) {
-                sucursal.get().setNomSucursal(sucursalDTO.getNomSucursal());
-                sucursal.get().setPaisSucursal(sucursalDTO.getPaisSucursal());
-                sucursalService.update(sucursal.get());
-                return new ResponseEntity<>(sucursalService.convertToDto(sucursalService.findById(id).get()), HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        ModelAndView modelAndView = new ModelAndView();
+        Optional<Sucursal> sucursal = sucursalService.findById(id);
+        if (id > 0 && sucursal.isPresent()) {
+            modelAndView.addObject("sucursalDTO", sucursalService.convertToDto(sucursal.get()));
+            modelAndView.setViewName("views/addSucursal");
+            return modelAndView;
+        } else {
+            attribute.addFlashAttribute("error","Error when editing Sucursal, Id null o not exist");
+            return new ModelAndView("redirect:" + "/sucursal/getAll");
         }
+
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<SucursalDTO> delete(@PathVariable("id") long id) {
+    @GetMapping("/delete/{id}")
+    public ModelAndView delete(@PathVariable("id") Integer id, RedirectAttributes attribute) {
         logger.info("Calling delete method");
-        try {
-            Optional<Sucursal> sucursal = sucursalService.findById(id);
-            if (sucursal.isPresent()) {
-                sucursalService.deleteById(id);
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
 
+        Optional<Sucursal> sucursal = sucursalService.findById(id);
+        if(id > 0 && sucursal.isPresent()) {
+            sucursalService.deleteById(id);
+            attribute.addFlashAttribute("warning", "Sucursal eliminada amb èxit");
+        } else {
+            attribute.addFlashAttribute("error","Error when editing Sucursal, Id null o not exist");
+        }
+        return new ModelAndView("redirect:" + "/sucursal/getAll");
     }
 
     @GetMapping("/getOne/{id}")
-    public ResponseEntity<SucursalDTO> getOne(@PathVariable("id") long id) {
+    public ModelAndView getOne(@PathVariable("id") Integer id, RedirectAttributes attribute) {
         logger.info("Calling getOne method");
-        try {
-            Optional<Sucursal> sucursal = sucursalService.findById(id);
-            if (sucursal.isPresent()) {
-                return new ResponseEntity<>(sucursalService.convertToDto(sucursal.get()), HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        ModelAndView modelAndView = new ModelAndView();
+
+        List<SucursalDTO> sucursalDTOS = Arrays.asList(sucursalService.findById(id)).stream().map(
+                s -> sucursalService.convertToDto(s.get())).collect(Collectors.toList());;
+        if (id > 0 && sucursalDTOS.size()==1) {
+            logger.info("SUCURSAL FOUND");
+            modelAndView.addObject("sucursals", sucursalDTOS);
+            modelAndView.setViewName("views/sucursals");
+            return modelAndView;
+        } else {
+            attribute.addFlashAttribute("error","Error when editing Sucursal, Id null o not exist");
+            return new ModelAndView("redirect:" + "/sucursal/getAll");
         }
+
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<SucursalDTO>> getAll() {
+    public ModelAndView getAll(Model model) {
         logger.info("Calling getAll method");
-        try {
-            List<SucursalDTO> sucursalDTOS = sucursalService.getAll().stream().map(
-                    s -> sucursalService.convertToDto(s)).collect(Collectors.toList());
-            return new ResponseEntity<>(sucursalDTOS, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        List<SucursalDTO> sucursalDTOS = sucursalService.getAll().stream().map(
+                s -> sucursalService.convertToDto(s)).collect(Collectors.toList());
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("sucursals", sucursalDTOS);
+        modelAndView.setViewName("views/sucursals");
+        return modelAndView;
+
     }
 }
